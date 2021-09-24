@@ -5,36 +5,9 @@ import * as Yup from "yup";
 import styled from "@emotion/styled";
 import "./styles.css";
 import "./styles-custom.css";
+import SupervisorComponent from "./api/supervisors";
+// import handleSubmit from "./api/submit";
 
-const MyTextInput = ({ label, ...props }) => {
-  // useField() returns [formik.getFieldProps(), formik.getFieldMeta()]
-  // which we can spread on <input> and alse replace ErrorMessage entirely.
-  const [field, meta] = useField(props);
-  return (
-    <>
-      <label htmlFor={props.id || props.name}>{label}</label>
-      <input className="text-input" {...field} {...props} />
-      {meta.touched && meta.error ? (
-        <div className="error">{meta.error}</div>
-      ) : null}
-    </>
-  );
-};
-
-const MyCheckbox = ({ children, ...props }) => {
-  const [field, meta] = useField({ ...props, type: "checkbox" });
-  return (
-    <>
-      <label className="checkbox">
-        <input {...field} {...props} type="checkbox" />
-        {children}
-      </label>
-      {meta.touched && meta.error ? (
-        <div className="error">{meta.error}</div>
-      ) : null}
-    </>
-  );
-};
 
 // Styled components ....
 const StyledSelect = styled.select`
@@ -74,8 +47,41 @@ const MySelect = ({ label, ...props }) => {
   );
 };
 
+const MyTextInput = ({ label, ...props }) => {
+  // useField() returns [formik.getFieldProps(), formik.getFieldMeta()]
+  // which we can spread on <input> and alse replace ErrorMessage entirely.
+  const [field, meta] = useField(props);
+  return (
+    <>
+      <label htmlFor={props.id || props.name}>{label}</label>
+      <input className="text-input" {...field} {...props} />
+      {meta.touched && meta.error ? (
+        <div className="error">{meta.error}</div>
+      ) : null}
+    </>
+  );
+};
+
+const MyCheckbox = ({ children, ...props }) => {
+  const [field, meta] = useField({ ...props, type: "checkbox" });
+  return (
+    <>
+      <label className="checkbox">
+        <input {...field} {...props} type="checkbox" />
+        {children}
+      </label>
+      {meta.touched && meta.error ? (
+        <div className="error">{meta.error}</div>
+      ) : null}
+    </>
+  );
+};
+
+
+
+
 // And now we can use these
-const SignupForm = () => {
+const NotifyForm = () => {
 
   return (
     <>
@@ -88,29 +94,27 @@ const SignupForm = () => {
           email: "",
           phoneCheck: false,
           phone: "",
-          supervisor: "" // added for our select
+          supervisor: "" 
         }}
         validationSchema={Yup.object({
           firstName: Yup.string()
-            .matches(/^[a-zA-Z]+$/ , {message: "Please enter only alphabetical characters for first names."})
+            .matches(/^[a-zA-Z]+$/ , {message: "Please enter only alphabetical characters for your first name"})
             .required("Required"),
           lastName: Yup.string()
-            .matches(/^[a-zA-Z]+$/ , {message: "Please enter only alphabetical characters for last names."})
+            .matches(/^[a-zA-Z]+$/ , {message: "Please enter only alphabetical characters for your last name"})
             .required("Required"),
-          emailCheck: Yup.boolean()
-            .oneOf([false], "Please enter an email address."),
+          emailCheck: Yup.boolean(),
           email: Yup.string()
-            .email("Please enter a valid email address."),
-          phoneCheck: Yup.boolean()
-            .oneOf([false], "Please enter a phone number."),
+            .email("Please enter a valid email address"),
+          phoneCheck: Yup.boolean(),
           phone: Yup.string()
-            .matches(/^([0-9]{10})+$/, {message: "Please enter a valid 10 digit phone number without () or -."}),
+            .matches(
+              /(^(((1\-)?\d{3}\-\d{3}\-\d{4})|(\(\d{3}\)\s\d{3}\-\d{4})|(\d{3}\.\d{3}\.\d{4}))(\s[x][0-9]+)?)+$/, {message: "Please enter a valid phone number"}),
           supervisor: Yup.string()
             .required("Required")
         })}
-        onSubmit={async (values, { setSubmitting }) => {
-          await new Promise(r => setTimeout(r, 500));
-          setSubmitting(false);
+        onSubmit= {values => {
+          alert(JSON.stringify(values));
         }}
       >
         <Form>
@@ -144,7 +148,7 @@ const SignupForm = () => {
           />
           <MySelect label="Supervisor" name="supervisor">
             <option value="">Select...</option>
-            <option value="john">John</option>
+            <SupervisorComponent />
           </MySelect>
 
          
@@ -156,15 +160,10 @@ const SignupForm = () => {
   );
 };
 
-function checkEmail() {
-  return this.email;
-}
-function checkPhone() {
-  return this.phone;
-}
+
 
 function App() {
-  return <SignupForm />;
+  return <NotifyForm />;
 }
 
 const rootElement = document.getElementById("root");
